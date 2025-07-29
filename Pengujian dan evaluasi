@@ -1,0 +1,121 @@
+Unit Testing (Pengujian Fungsi Individu)
+Setiap metode pada kelas Barang dan Inventaris dapat diuji secara terpisah menggunakan framework unittest (atau pytest) di Python:
+
+Kelas Barang:
+
+- Pastikan to_dict() menghasilkan dict dengan key "kode", "nama", "stok" dengan nilai yang benar.
+
+- tampilkan_info() bisa diuji dengan menangkap keluaran stdout.
+
+Kelas Inventaris:
+
+- tambah_barang(): menambahkan barang baru, memastikan barang ditambahkan dan tidak duplikat.
+
+- hapus_barang(): barang berhasil dihapus jika ada, dan memberi pesan jika tidak ada.
+
+- cari_barang(): ketika kode ada/ tidak ada, fungsi mengembalikan objek atau None.
+
+- generate_report(): menampilkan laporan dengan format yang benar dan menjumlah stok serta jumlah barang dengan tepat.
+
+
+Integration Testing (Pengujian Terpadu)
+Tes integrasi dilakukan untuk menjalankan alur fungsi antar metode:
+
+- Simulasi tambah → cari → hapus → generate_report dan verifikasi data sesuai harapan.
+
+- Tes load_data() dan save_data():
+
+- Buat file JSON sementara (dummy).
+
+- Muat data lewat load_data(), lalu panggil save_data().
+
+- Bandingkan file JSON hasil dengan data awal.
+
+- Tes backup_data():
+
+- Cek apakah folder backups/ dibuat.
+
+- Periksa file backup baru dengan timestamp, format JSON valid, dan isinya sama seperti daftar barang saat backup.
+
+
+Pengujian Manual (Exploratory Testing)
+Jalankan aplikasi, coba menu:
+
+- Tambah barang dengan stok valid/invalid.
+
+- Hapus barang dengan kode yang ada dan yang tidak ada.
+
+- Cari barang.
+
+- Tampilkan semua barang ketika inventaris kosong dan berisi barang.
+
+- Backup data, lalu lihat output dan isi file backup.
+
+- Simulasikan kondisi error seperti file data_inventaris.json corrupt: coba bawakan skenario load_data() gagal baca file JSON—pastikan aplikasi tidak crash.
+
+Evaluasi Kualitas Aplikasi
+Gunakan metrik sederhana:
+
+- Coverage testing: pakai coverage.py untuk mengetahui bagian mana dari kode yang belum diuji.
+
+Evaluasi keandalan:
+
+Apakah operasi CRUD bekerja akurat?
+
+Apakah backup benar dibuat dengan timestamp dan tidak menimpa file lama?
+
+Apakah laporan stok (jumlah & total stok) benar?
+
+Evaluasi kegunaan:
+
+Apakah pesan di CLI jelas?
+
+Respons terhadap input invalid sudah tepat?
+
+Contoh Struktur Unit Test dengan unittest
+python
+Salin
+Edit
+import unittest
+import os
+import json
+from barang_module import Barang, Inventaris
+
+class TestInventaris(unittest.TestCase):
+    def setUp(self):
+        self.inv = Inventaris()
+        self.inv.daftar_barang = []  # reset
+
+    def test_tambah_cari_hapus_barang(self):
+        b = Barang("K01", "Pensil", 10)
+        self.inv.tambah_barang(b)
+        self.assertIsNotNone(self.inv.cari_barang("K01"))
+        self.inv.hapus_barang("K01")
+        self.assertIsNone(self.inv.cari_barang("K01"))
+
+    def test_save_load(self):
+        b = Barang("K02", "Pulpen", 15)
+        self.inv.tambah_barang(b)
+        self.inv.save_data()
+        inv2 = Inventaris()
+        inv2.load_data()
+        self.assertIsNotNone(inv2.cari_barang("K02"))
+        os.remove(Inv2.DATA_FILE)
+
+    def test_backup_data_creates_file(self):
+        b = Barang("K03", "Penghapus", 5)
+        self.inv.tambah_barang(b)
+        self.inv.backup_data()
+        # cek file dalam folder backups
+        files = os.listdir(self.inv.BACKUP_DIR)
+        self.assertTrue(any("inventaris_backup_" in fname for fname in files))
+
+Kesimpulan
+
+- Unit testing cocok untuk verifikasi perilaku fungsi dasar.
+
+- Integration testing penting untuk memastikan berbagai fungsi bekerja bersama dengan baik.
+
+- Manual testing membantu mendeteksi bug UI/UX atau error tidak terduga.
+
+- Evaluasi metrik, coverage, dan respons pengguna (dari input/output) memastikan kode berfungsi andal dan mudah digunakan.
