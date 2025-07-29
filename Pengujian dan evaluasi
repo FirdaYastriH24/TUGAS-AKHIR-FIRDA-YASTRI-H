@@ -110,6 +110,8 @@ class TestInventaris(unittest.TestCase):
         files = os.listdir(self.inv.BACKUP_DIR)
         self.assertTrue(any("inventaris_backup_" in fname for fname in files))
 
+
+
 Kesimpulan
 
 - Unit testing cocok untuk verifikasi perilaku fungsi dasar.
